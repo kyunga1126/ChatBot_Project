@@ -1,0 +1,560 @@
+from flask import Flask, request, jsonify
+import pymysql
+import random
+
+# Database connection setup
+conn = pymysql.connect(
+    host="13.124.40.13", 
+    port=53365, 
+    db='friendly', 
+    user='root', 
+    password='12345',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+
+application = Flask(__name__)
+
+# 전역 변수 선언
+step1_platform = None
+step2_players = None
+step3_difficulty = None
+step4_category = None
+
+gender = None
+age_group = None
+
+# ----------------------------------------------------------------------------------------------------
+# 시작 코드
+@application.route('/start', methods=['POST'])
+def start():
+    body = request.get_json()
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [ 
+            {
+                    "carousel": {
+                        "type": "basicCard",
+                        "items": [
+                            {
+                                "title": "안녕하세요! 플투 챗봇입니다.",
+                                "description": "다양한 기능들을 제공하고 있습니다. \n어떤 기능을 원하시나요?",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FTZh2C%2FbtsHzbNga9I%2FuLbymZLQ1J5s0svYBur0WK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "친구 찾기",
+                                        "messageText": "친구 찾기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "게임 추천 받기",
+                                        "messageText": "게임 추천 받기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "포인트 조회",
+                                        "messageText": "포인트 조회"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "안녕하세요! 플투 챗봇입니다.",
+                                "description": "다양한 기능들을 제공하고 있습니다. \n어떤 기능을 원하시나요?",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fbolvbc%2FbtsHy9WaW9J%2F564XDZ8ezXAZp7JL9TP9kK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "자주 묻는 질문 보기",
+                                        "messageText": "자주 묻는 질문 보기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "문의 및 신고 하기",
+                                        "messageText": "문의 및 신고 하기"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return jsonify(response)
+# ----------------------------------------------------------------------------------------------------
+# 게임 추천 step1
+@application.route('/step1_gamesuggest', methods=['POST'])
+def step1_gamesuggest():
+    body = request.get_json()
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "어느 플랫폼에서 게임을 즐기시나요?",
+          "description": "PC, 모바일 중 선택해주세요.",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "PC에서 주로 해요.",
+              "messageText": "PC"
+            },
+            {
+              "action": "message",
+              "label": "모바일에서 주로 해요.",
+              "messageText": "모바일"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+# ----------------------------------------------------------------------------------------------------
+# 게임 추천 step2
+@application.route('/step2_gamesuggest', methods=['POST'])
+def step2_gamesuggest():
+    global step1_platform
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step1_platform = body['userRequest']['utterance']
+    print(f'step1_platform : {step1_platform}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "혼자 하시나요, 아니면 친구들과 함께 하시나요?",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "혼자 게임하기",
+              "messageText": "혼자"
+            },
+            {
+              "action": "message",
+              "label": "친구들과 함께",
+              "messageText": "다중"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+# ----------------------------------------------------------------------------------------------------
+# 게임 추천 step3
+@application.route('/step3_gamesuggest', methods=['POST'])
+def step3_gamesuggest():
+    global step2_players
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step2_players = body['userRequest']['utterance']
+    print(f'step2_players : {step2_players}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "게임의 난이도는 어느 정도를 원하시나요?",
+          "description": "쉬움, 보통, 어려움 중 선택해주세요",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "쉬움 난이도로요.",
+              "messageText": "쉬움"
+            },
+            {
+              "action": "message",
+              "label": "보통 난이도로요.",
+              "messageText": "보통"
+            },
+            {
+              "action": "message",
+              "label": "어려움 난이도로요.",
+              "messageText": "어려움"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+# ----------------------------------------------------------------------------------------------------
+# 게임 추천 step4_장르
+@application.route('/step4_gamesuggest', methods=['POST'])
+def step4_gamesuggest():
+    global step3_difficulty
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step3_difficulty = body['userRequest']['utterance']
+    print(f'step3_difficulty : {step3_difficulty}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "carousel": {
+          "type": "basicCard",
+          "items": [
+            {
+              "title": "어떤 장르의 게임을 선호하시나요?",
+              "thumbnail": {
+                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FBjhPu%2FbtsHzDCsgQ2%2F5TaUxGxVbNT4OUFzoWE5d0%2Fimg.jpg"
+              },
+              "buttons": [
+                {
+                  "action": "message",
+                  "label": "액션",
+                  "messageText": "액션"
+                },
+                {
+                  "action":  "message",
+                  "label": "어드벤처",
+                  "messageText": "어드벤처"
+                },
+                {
+                  "action":  "message",
+                  "label": "RPG",
+                  "messageText": "RPG"
+                }
+              ]
+            },
+            {
+              "title": "어떤 장르의 게임을 선호하시나요?",
+              "thumbnail": {
+                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbMo4yv%2FbtsHANjLtIz%2FrIjhFWDvI2xMqqiyIOthq0%2Fimg.jpg"
+              },
+              "buttons": [
+                {
+                  "action": "message",
+                  "label": "퍼즐",
+                  "messageText": "퍼즐"
+                },
+                {
+                  "action":  "message",
+                  "label": "스포츠",
+                  "messageText": "스포츠"
+                },
+                {
+                  "action":  "message",
+                  "label": "슈팅",
+                  "messageText": "슈팅"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+
+# ----------------------------------------------------------------------------------------------------
+# 게임 추천 step5_SQL문 반환하기
+@application.route('/step5_gamesuggest', methods=['POST'])
+def step5_gamesuggest():
+    global step1_platform, step2_players, step3_difficulty, step4_category, conn
+    body = request.get_json()
+
+    # 'utterance' 값 가져오기
+    step4_category = body['userRequest']['utterance']
+    print(f'step4_category : {step4_category}')
+
+    # SQL문
+    cursor = conn.cursor()
+    sql = "SELECT * FROM gamesuggest WHERE platform = %s AND players = %s AND game_difficulty = %s AND game_category = %s"
+    cursor.execute(sql, (step1_platform, step2_players, step3_difficulty, step4_category))
+    suppliers = cursor.fetchall()
+
+    # 터미널 출력 확인용
+    for supplier in suppliers:
+        print(supplier)
+
+    random_suppliers = random.sample(suppliers, k=3)  # suppliers 리스트에서 랜덤하게 3개의 항목을 선택
+
+    game_dict = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                "simpleText": {
+                    "text": f"알겠습니다. 그러면 {step1_platform}에서 {step2_players} 즐길 수 있는 {step3_difficulty} 난이도의 {step4_category} 게임을 추천해드릴게요."
+                }
+            },
+            {
+                    "carousel": {
+                        "type": "basicCard",
+                        "items": [
+                            {
+                                "title": random_suppliers[0]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[0]['platform']}, 장르: {random_suppliers[0]['game_category']}, 난이도: {random_suppliers[0]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F5is5P%2FbtsHAwvMMz5%2FyzYPVs9ywZG1cxz2bMraL0%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": random_suppliers[1]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[1]['platform']}, 장르: {random_suppliers[1]['game_category']}, 난이도: {random_suppliers[1]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdlFnmf%2FbtsHzck2Nnj%2FAaN4sQu8NJQI521KIIpGIK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": random_suppliers[2]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[2]['platform']}, 장르: {random_suppliers[2]['game_category']}, 난이도: {random_suppliers[2]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fbz918Y%2FbtsHz7J4CBY%2Fm3vQCTxHSjqEz12eKfNEiK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+              {
+                "messageText": "처음으로",
+                "action": "message",
+                "label": "처음으로"
+              },
+              {
+                "messageText": "다시 게임 추천 받기",
+                "action": "message",
+                "label": "다시 게임 추천 받기"
+              }
+            ]
+        }
+    }
+    # JSON 형식으로 변환하여 반환
+    return jsonify(game_dict)
+# ----------------------------------------------------------------------------------------------------
+# 성별 선택_민
+# 성별 선택
+@application.route('/step1_friend', methods=['POST'])
+def step1_friend():
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "textCard": {
+                        "title": "친구를 찾아볼까요?",
+                        "description": "어떤 친구를 찾아볼까요?. \n 성별을 선택해 주세요!",
+                        "buttons": [
+                            {
+                                "action": "message",
+                                "label": "여자",
+                                "messageText": "여자"
+                            },
+                            {
+                                "action": "message",
+                                "label": "남자",
+                                "messageText": "남자"
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 나이대 선택
+@application.route('/step2_friend', methods=['POST'])
+def step2_friend():
+    global gender
+    body = request.get_json()
+    gender = body['userRequest']['utterance']  # 성별 선택된 값
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "carousel": {
+                        "type": "textCard",
+                        "items": [
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "10대",
+                                        "messageText": "10대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "20대",
+                                        "messageText": "20대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "30대",
+                                        "messageText": "30대"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "40대",
+                                        "messageText": "40대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "50대",
+                                        "messageText": "50대"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 친구 추천 기능
+def get_recommended_friends():
+    global gender, age_group, conn
+    body = request.get_json()
+    age_group = body['userRequest']['utterance'].strip()  # 나이 선택된 값
+
+    cursor = conn.cursor()
+
+    age_group_query = {
+        '10대': 'age >= 10 AND age < 20',
+        '20대': 'age >= 20 AND age < 30',
+        '30대': 'age >= 30 AND age < 40',
+        '40대': 'age >= 40 AND age < 50',
+        '50대': 'age >= 50 AND age < 60'
+    }.get(age_group, 'age >= 0')
+
+    gender_query = 'F' if gender == '여자' else 'M'
+    
+    sql = "SELECT name FROM customer WHERE gender = %s AND " + age_group_query
+    cursor.execute(sql, (gender_query,))
+    suppliers = cursor.fetchall()
+
+    result = [supplier[0] for supplier in suppliers][:6]
+    recommended_friends = random.sample(result, len(result))
+
+    friend_details = {}
+    for name in recommended_friends:
+        # Get games and age
+        cursor.execute("SELECT game_name, age FROM customer WHERE name = %s", (name,))
+        data = cursor.fetchone()
+        if data:
+            game_name, age = data
+            friend_details[name] = {'games': game_name, 'age': age}
+
+    cursor.close()
+    return recommended_friends, friend_details
+
+
+@application.route('/step3_friend', methods=['POST'])
+def step3_friend():
+    recommended_friends, friend_details = get_recommended_friends()
+    return jsonify(recommended_friends, friend_details)
+
+
+@application.route('/step4_friend', methods=['POST'])
+def step4_friend():
+    recommended_friends, friend_details = get_recommended_friends()
+
+    items = []
+    for friend in recommended_friends[:3]:
+        details = friend_details[friend]
+        items.append({
+            "title": f"닉네임: {friend}",
+            "description": f"# {details['games']} #{details['age']}살 #{gender}",
+            "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+            "link": {
+                "web": "https://www.naver.com"
+            }
+        })
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "친구를 추천해줄게"
+                        },
+                        "items": items
+                    }
+                }
+            ]
+        }
+    }
+    return responseBody
+
+
+
+if __name__ == "__main__":
+    application.run(host='0.0.0.0', port=80)

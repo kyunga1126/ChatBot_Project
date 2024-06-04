@@ -1,0 +1,60 @@
+/*
+-- question 테이블 생성
+create table question(id varchar(20) not null primary key, ask varchar(50),answer varchar(100) , kind varchar(15), read_count int, date varchar(15));
+
+-- user
+insert into question (id, ask, kind, read_count, date) values("01","회원 나이 제한은?","user",2,"2024.01.08");
+insert into question (id, ask, kind, read_count, date) values("02","아이디, 비번 찾는 방법?","user",7,"2023.07.29");
+insert into question (id, ask, kind, read_count, date) values("03","로그인을 하는데 휴면 상태 해결은?","user",10,"2024.03.19");
+insert into question (id, ask, kind, read_count, date) values("04","자신이 가진 포인트를 어떻게 조회?","user",4,"2023.09.15");
+insert into question (id, ask, kind, read_count, date) values("05","사용되는 아이디가 두 가지 있던데?","user",6,"2024.02.05");
+insert into question (id, ask, kind, read_count, date) values("06","정보가 잘못 표기되어 있는데 어떻게 수정?","user",7,"2024.01.18");
+insert into question (id, ask, kind, read_count, date) values("07","계정의 주 기능?","user",9,"2024.02.28");
+insert into question (id, ask, kind, read_count, date) values("08","회원 탈퇴는 어떻게?","user",4,"2023.08.05");
+
+update question set answer="회원이 되려면 만 12세부터 가능합니다." where id="01";
+update question set answer="아이디->이메일, 비밀번호는 아이디,이메일로 찾을 수 있습니다." where id="02";
+update question set answer="내 정보에서 휴면 상태 해제를 선택하여 진행하면 됩니다." where id="03";
+update question set answer="내 정보에서 확인 가능하며, 내역까지 볼 수 있습니다." where id="04";
+update question set answer="아이디 중 이메일이 표시된 아이디는 계정 아이디로, 가입하실 때의 아이디는 게임 친구한테 표시되는 닉네임을 의미합니다." where id="05";
+update question set answer="내 정보에서 하단에 수정하기를 클릭하시면 수정이 됩니다." where id="06";
+update question set answer="계정으로 게임친구 찾기, 포인트 조회하실 수 있습니다." where id="07";
+update question set answer="회원 탈퇴는 회원정보 하단에 선택하여 진행할 수 있습니다." where id="08"; 
+
+-- friend
+insert into question (id, ask, kind,read_count, date) values("09","여기에서의 게임친구란?","friend",2,"2024.01.08");
+insert into question (id, ask, kind,read_count, date) values("10","게임친구를 추가하는 방법?","friend",7,"2023.07.29");
+insert into question (id, ask, kind,read_count, date) values("11","게임친구와 포인트와의 관계?","friend",10,"2024.03.19");
+insert into question (id, ask, kind,read_count, date) values("12","게임친구와 게임 하는 방법?","friend",4,"2023.09.15");
+insert into question (id, ask, kind,read_count, date) values("13","계정에 사용되는 아이디가 두 가지?","friend",6,"2024.02.05");
+insert into question (id, ask, kind,read_count, date) values("14","게임친구와 한 판 같이 하는데 드는 비용?","friend",7,"2024.01.18");
+insert into question (id, ask, kind,read_count, date) values("15","게임친구를 삭제하는 방법?","friend",9,"2024.02.28");
+insert into question (id, ask, kind,read_count, date) values("16","게임친구를 삭제하는 방법?","friend",4,"2023.08.05"); 
+
+update question set answer="게임친구는 게임에서 같이 할 친구를 의미합니다.." where id="09";
+update question set answer="게임친구는 게임친구 항목을 클릭하여 추가하실 수 있습니다." where id="10";
+update question set answer="포인트가 있어야 게임친구와 같이 할 수 있습니다." where id="11";
+update question set answer="게임친구와 채팅을 해서 같이 하실 수 있습니다." where id="12";
+update question set answer="이메일 아이디->계정 아이디로, 가입 아이디->게임 친구한테 표시되는 닉네임을 의미합니다." where id="13";
+update question set answer="한 판 하는데 드는 비용은 ㅇㅇㅇ입니다." where id="14";
+update question set answer="게임친구는 내 친구 보기에서 삭제 버튼을 클릭하시면 됩니다." where id="15";
+update question set answer="내 친구 항목에서 신고하기를 클릭하여 신고하시면 됩니다." where id="16";
+
+-- other
+insert into question  (id, ask, kind, read_count, date) values("17","이 사이트는 무엇을 하는 사이트?","other",2,"2024.01.08");
+insert into question  (id, ask, kind, read_count, date) values("18","사이트의 기능들은 어떤 것들이?","other",7,"2023.07.29");
+insert into question  (id, ask, kind, read_count, date) values("19","플투 포인트란?","other",10,"2024.03.19");
+insert into question  (id, ask, kind, read_count, date) values("20","플투 포인트 충전 방법은?","other",4,"2023.09.15");
+insert into question  (id, ask, kind ,read_count, date) values("21","게임 종류에 대한 안내?","other",6,"2024.02.05");
+insert into question  (id, ask, kind, read_count, date) values("22","사이트에서의 플투스란?","other",7,"2024.01.18");
+insert into question  (id, ask, kind, read_count, date) values("23","이 사이트의 게시판의 구성?","other",9,"2024.02.28");
+insert into question  (id, ask, kind, read_count, date) values("24","플투에 궁금한것?","other",4,"2023.08.05"); 
+
+update question  set answer="저희 플투는 게임친구를 추가하여 게임을 같이 해주게끔 하는 사이트입니다." where id=17;
+update question  set answer="게임 친구 추가, 포인트 조회, 자유 게시판 작성 등이 있습니다." where id=18;
+update question  set answer="플투 포인트는 게임친구와 게임을 같이 하는데 필요한 포인트입니다." where id=19;
+update question  set answer="포인트는 유료로 충전하거나, 무료 이벤트로 충전 가능합니다." where id=20;
+update question  set answer="챗봇 플투스을 사용하여 추천 받을 수 있습니다." where id=21;
+update question  set answer="플투스는 사이트를 이용하는데 복잡하다는 문제를 해결하기 위해 나온 챗봇 시스템입니다." where id=22;
+update question  set answer="저희 사이트의 게시판은 크게 공지사항, 이벤트, 자유게시판 등이 있습니다." where id=23;
+update question  set answer="고객센터를 통해서 게시판으로 문의가 가능합니다." where id=24; */

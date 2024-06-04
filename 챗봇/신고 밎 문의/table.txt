@@ -1,0 +1,9 @@
+CREATE TABLE `customer_ask` (
+  `bno` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(20) NOT NULL,
+  `ask` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `report` varchar(500) DEFAULT NULL,
+  `readCount` int DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
+  PRIMARY KEY (`bno`)
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

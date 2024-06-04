@@ -1,0 +1,63 @@
+from flask import Blueprint, request, jsonify
+from utils import get_users_by_class #utils파일내의 get_users_by_class 가져오기
+
+bp = Blueprint('point', __name__, url_prefix='/')
+
+@bp.route('/class', methods=['POST'])
+def webhook():
+    data = request.get_json()
+    print("Received data:", data)
+
+    if 'userRequest' in data and 'utterance' in data['userRequest']:
+        utterance = data['userRequest']['utterance']
+        print("Received utterance:", utterance)
+
+        point_class = None
+        if '브론즈' in utterance:
+            point_class = '브론즈'
+        elif '실버' in utterance:
+            point_class = '실버'
+        elif '골드' in utterance:
+            point_class = '골드'
+        elif 'VIP' in utterance:
+            point_class = 'VIP'
+        else:
+            response_text = "오류가 발생했습니다. 다시 시도해주세요."
+            return jsonify({
+                'version': '2.0',
+                'template': {
+                    'outputs': [{
+                        'basicCard': {
+                            'title': '알림',
+                            'description': response_text,
+                            'buttons': [
+                                {
+                                    'action': 'block',
+                                    'label': '다시 조회',
+                                    'blockId': '등급선택'
+                                }
+                            ]
+                        }
+                    }]
+                }
+            })
+
+        response_text = get_users_by_class(point_class)
+        return jsonify({
+            'version': '2.0',
+            'template': {
+                'outputs': [{
+                    'basicCard': {
+                        'title': f'{point_class} 등급 사용자 목록',
+                        'description': response_text,
+                        'buttons': [
+                            {
+                                'action': 'message',
+                                'label': '다시 조회',
+                                'messageText': '다시 조회'
+                            }
+                        ]
+                    }
+                }]
+            }
+        })

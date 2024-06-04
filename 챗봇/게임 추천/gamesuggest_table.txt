@@ -1,0 +1,10 @@
+CREATE TABLE `gamesuggest` (
+  `game_id` int NOT NULL AUTO_INCREMENT,
+  `game_name` varchar(100) NOT NULL,
+  `platform` enum('PC','모바일') NOT NULL,
+  `game_site` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `game_category` enum('액션','어드벤처','RPG','퍼즐','스포츠','슈팅') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `game_difficulty` enum('쉬움','보통','어려움') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `players` enum('혼자','다중') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`game_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

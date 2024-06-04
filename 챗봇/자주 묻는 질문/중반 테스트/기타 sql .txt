@@ -1,0 +1,20 @@
+/*
+create table others(id int not null, ask varchar(50),answer varchar(100) , read_count int, date varchar(15));
+
+insert into others (id, ask, read_count, date) values(1,"이 사이트는 무엇을 하는 사이트인가요?",2,"2024.01.08");
+insert into others (id, ask, read_count, date) values(2,"사이트의 기능들은 어떤 것들이 있나요?",7,"2023.07.29");
+insert into others (id, ask, read_count, date) values(3,"플투 포인트가 무엇인가요?",10,"2024.03.19");
+insert into others (id, ask, read_count, date) values(4,"플투 포인트 충전 방법은 어떻게 하나요?",4,"2023.09.15");
+insert into others (id, ask, read_count, date) values(5,"게임 종류가 많아서 혼란스러운데 어디서 볼 수 있는 사이트가 있을까요?",6,"2024.02.05");
+insert into others (id, ask, read_count, date) values(6,"사이트에서 유독 플투스 문구가 잘 보이는데 이건 무엇인가요?",7,"2024.01.18");
+insert into others (id, ask, read_count, date) values(7,"이 사이트의 게시판의 구성은 어떻게 되나요?",9,"2024.02.28");
+insert into others (id, ask, read_count, date) values(8,"플투에 궁금한것이 있는데 어디에서 하나요?",4,"2023.08.05"); 
+
+update others set answer="저희 플투는 게임친구를 추가하여 게임을 같이 해주게끔 하는 사이트입니다." where id=1;
+update others set answer="게임 친구 추가, 포인트 조회, 자유 게시판 작성 등이 있습니다." where id=2;
+update others set answer="플투 포인트는 게임친구와 게임을 같이 하는데 필요한 포인트입니다." where id=3;
+update others set answer="포인트는 유료로 충전하거나, 무료 이벤트로 충전 가능합니다." where id=4;
+update others set answer="게임에 관해서는 저희 사이트의 챗봇인 플투스가 도와주게 되어 다방면으로 추천을 해줍니다.." where id=5;
+update others set answer="플투스는 사이트를 이용하는데 복잡하다는 문제를 해결하기 위해 나온 챗봇 시스템입니다." where id=6;
+update others set answer="저희 사이트의 게시판은 크게 공지사항, 이벤트, 자유게시판 등이 있습니다." where id=7;
+update others set answer="사이트 메뉴의 고객센터를 통해서 게시판으로 문의가 가능합니다." where id=8; */

@@ -1,0 +1,86 @@
+from flask import Flask, jsonify, request
+import csv
+import random
+
+app = Flask(__name__)
+
+# CSV 파일 경로 설정
+CSV_FILE_PATH = r'customer.csv'
+
+
+# CSV 파일에서 고객 데이터를 읽는 함수
+def read_customers_from_csv():
+    customers = []
+    try:
+        with open(CSV_FILE_PATH, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                customers.append(row)
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
+    return customers
+
+
+# 특정 조건을 만족하는 고객 리스트 필터링 함수
+def filter_customers(customers, excluded_id=None):
+    filtered_customers = [
+        customer for customer in customers
+        if customer['gender'] != 'M' and 10 <= int(customer['age']) < 20
+    ]
+    if excluded_id:
+        filtered_customers = [
+            customer for customer in filtered_customers
+            if customer['id'] != excluded_id
+        ]
+    return filtered_customers
+
+
+# POST 요청에서 특정 id를 제외한 고객 5명 랜덤 추출 및 특정 형식으로 반환
+@app.route('/customers', methods=['POST'])
+def get_random_customers():
+    body = request.get_json()
+    if 'id' not in body or 'outputType' not in body:
+        return jsonify({'error': 'No id or outputType provided'})
+    
+    excluded_id = body['id']
+    output_type = body['outputType']
+    customers = read_customers_from_csv()
+    filtered_customers = filter_customers(customers, excluded_id)
+    
+    if len(filtered_customers) < 5:
+        return jsonify({'error': 'Not enough customers to select from'})
+    
+    random_customers = random.sample(filtered_customers, 5)
+    
+    if output_type == "listCustomer":
+        response_data = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "listCard": {
+                            "header": {
+                                "title": "listCustomer 테스트"
+                            },
+                            "items": [
+                                {
+                                    "title": customer['id'],
+                                    "description": f"{customer['gender']}, {customer['age']}",
+                                    "link": {
+                                        "web": "https://www.naver.com"
+                                    }
+                                }
+                                for customer in random_customers
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+        return jsonify(response_data)
+    else:
+        return jsonify({'error': 'Invalid outputType'})
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

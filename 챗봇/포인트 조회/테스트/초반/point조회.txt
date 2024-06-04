@@ -1,0 +1,108 @@
+from flask import Flask, request, jsonify
+from datetime import datetime
+import MySQLdb
+import csv
+
+
+
+app = Flask(__name__)
+
+def get_db_connection():
+    try:
+        return MySQLdb.connect(
+            # host="localhost",
+            user="root",
+            passwd="12345",
+            db="users",
+            connect_timeout=10  # 연결 시간 초과 설정
+        )
+    except MySQLdb.MySQLError as e:
+        print(f"Error connecting to the database: {e}")
+        return None
+
+def insert_data_from_csv(csv_file_path):
+    connection = get_db_connection()
+    if connection is None:
+        return
+    cursor = connection.cursor()
+    with open(csv_file_path, newline='') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',')
+        next(csvreader)  # 첫 번째 행 건너뛰기
+        for row in csvreader:
+            try:
+                # 'point' 값을 정수로 변환, 빈 값은 0으로 설정
+                point_value = int(row[3]) if row[3] else 0
+                # 'atCheck' 값을 변환, 빈 값은 None으로 설정
+                at_check_value = row[4] if row[4] else None
+                # 'date' 값을 'YYYY-MM-DD HH:MM:SS' 형식으로 변환
+                date_value = datetime.strptime(row[2], '%Y-%m-%d').strftime('%Y-%m-%d')
+            except ValueError as e:
+                print(f"Error converting data for row {row}: {e}")
+                continue  # 데이터 변환에 실패한 경우 다음 행으로 넘어감
+            # 데이터베이스에 삽입
+            cursor.execute("INSERT INTO customer_event (id, date, point, atCheck) VALUES (%s, %s, %s, %s)", 
+                                   (row[1], date_value, point_value, at_check_value))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_user_points_by_id(user_id):
+    connection = get_db_connection()
+    if connection is None:
+        return None
+    cursor = connection.cursor()
+    query = "SELECT id, point FROM customer_event WHERE id = %s"
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    if result:
+        return result[1]  # 포인트 반환
+    else:
+        return None  # 사용자를 찾을 수 없을 때 None 반환
+
+@app.route('/points', methods=['POST'])
+def webhook():
+    data = request.get_json()
+    user_id = data['userRequest']['user']['id']
+    points = get_user_points_by_id(user_id)
+    if points is not None:
+        response = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                            "text": f"사용자 {user_id}님의 포인트는 {points}점입니다."
+                        }
+                    }
+                ]
+            }
+        }
+    else:
+        response = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                            "text": "해당 사용자를 찾을 수 없습니다."
+                        }
+                    }
+                ]
+            }
+        }
+    return jsonify(response)
+
+if __name__ == '__main__':
+    try:
+        # CSV 파일 경로 지정
+        csv_file_path = "customer_event.csv"  # CSV 파일 경로
+
+        # CSV 파일에서 데이터를 읽어와 MySQL 데이터베이스에 삽입
+        insert_data_from_csv(csv_file_path)
+    except Exception as e:
+        print(f"Error inserting data from CSV: {e}")
+
+    # Flask 애플리케이션 실행
+    app.run(host="0.0.0.0", port=8080)

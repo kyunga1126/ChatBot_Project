@@ -1,0 +1,8 @@
+CREATE TABLE `customer_event` (
+  `cno` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(20) NOT NULL,
+  `date` datetime NOT NULL,
+  `point` int DEFAULT NULL,
+  `atCheck` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`cno`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=947 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

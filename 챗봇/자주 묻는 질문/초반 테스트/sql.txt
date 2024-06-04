@@ -1,0 +1,16 @@
+/*
+create database chatbot;
+create table customer_ask(id int not null, ask varchar(50), 
+read_count int, report varchar(70), date varchar(15));
+
+insert into customer_ask (id, ask, read_count,report, date) values(4,"외국인 친구가 있어서 언어 바꿔서 해보고 싶은데 어떻게 사용하나요?",2,null,"2024.01.08");
+insert into customer_ask (id, ask, read_count,report, date) values(1,"플투 포인트는 어떻게 충전하나요?",7,null,"2023.07.29");
+insert into customer_ask (id, ask, read_count,report, date) values(2,"전적 검색 기능을 알고 싶어요?",10,null,"2024.03.19");
+insert into customer_ask (id, ask, read_count,report, date) values(3,"출석체크는 어떻게 하는건가요?",4,null,"2023.09.15");
+insert into customer_ask (id, ask, read_count,report, date) values(5,"사이트에 있는 챗봇을 처음 써보는데 어떻게 하나요?",6,null,"2024.02.05");
+insert into customer_ask (id, ask, read_count,report, date) values(6,"게임친구에 대한 알림 설정은 어떻게 하나요?",7,null,"2024.01.18");
+insert into customer_ask (id, ask, read_count,report, date) values(7,"친구 찾기를 어떻게 하나요?",9,null,"2024.02.28");
+insert into customer_ask (id, ask, read_count,report, date) values(8,"게임 친구한테 신고하고 싶은데 어떻게 하나요?",1,null,"2022.01.05");
+insert into customer_ask (id, ask, read_count,report, date) values(9,"게임이 너무 많아서 추천 사이트를 알려줄수 있나여?",3,null,"2023.09.03");
+insert into customer_ask (id, ask, read_count,report, date) values(10,"자유 게시판 사용하는 방법은 무엇인가요?",4,null,"2023.08.05"); */
+

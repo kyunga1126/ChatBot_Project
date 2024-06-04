@@ -1,0 +1,320 @@
+# 게임 추천 기능_step1_현준
+
+# mysqlclient 설치하여 MySQLdb 호출
+import pymysql
+import random
+
+# flask에 있는 request와 Bluepoint 호출
+from flask import Blueprint, request, Flask, jsonify
+
+# MySQL 객체 등록
+conn = pymysql.connect(
+    host="52.78.100.77",
+    port=54201,
+    db='friendly',
+    user='root',
+    password='12345',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+# 전역 변수 선언
+step1_platform = None
+step2_players = None
+step3_difficulty = None
+step4_category = None
+
+# 블루프린트 객체 등록
+bp = Blueprint('pltoo_gamesuggest', __name__, url_prefix='/')
+
+@bp.route('/step1_gamesuggest', methods=['POST'])
+def step1_gamesuggest():
+    body = request.get_json()
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "어느 플랫폼에서 게임을 즐기시나요?",
+          "description": "PC, 모바일 중 선택해주세요.",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "📟PC에서 주로 해요",
+              "messageText": "PC"
+            },
+            {
+              "action": "message",
+              "label": "📱모바일에서 주로 해요",
+              "messageText": "모바일"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+
+# ------------------------------------------------------------------------------------------------------------------------------
+@bp.route('/step2_gamesuggest', methods=['POST'])
+def step2_gamesuggest():
+    global step1_platform
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step1_platform = body['userRequest']['utterance']
+    print(f'step1_platform : {step1_platform}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "혼자 하시나요, 아니면 친구들과 함께 하시나요?",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "☝혼자 게임하기",
+              "messageText": "혼자"
+            },
+            {
+              "action": "message",
+              "label": "✌친구들과 함께",
+              "messageText": "다중"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+@bp.route('/step3_gamesuggest', methods=['POST'])
+def step3_gamesuggest():
+    global step2_players
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step2_players = body['userRequest']['utterance']
+    print(f'step2_players : {step2_players}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "textCard": {
+          "title": "게임의 난이도는 어느 정도를 원하시나요?",
+          "description": "쉬움, 보통, 어려움 중 선택해주세요",
+          "buttons": [
+            {
+              "action": "message",
+              "label": "😊쉬움 난이도로요.",
+              "messageText": "쉬움"
+            },
+            {
+              "action": "message",
+              "label": "😐보통 난이도로요.",
+              "messageText": "보통"
+            },
+            {
+              "action": "message",
+              "label": "🤬어려움 난이도로요.",
+              "messageText": "어려움"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+# -------------------------------------------------------------------------------------------------------------------------------------
+@bp.route('/step4_gamesuggest', methods=['POST'])
+def step4_gamesuggest():
+    global step3_difficulty
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    step3_difficulty = body['userRequest']['utterance']
+    print(f'step3_difficulty : {step3_difficulty}')
+    
+    response = {
+  "version": "2.0",
+  "template": {
+    "outputs": [
+      {
+        "carousel": {
+          "type": "basicCard",
+          "items": [
+            {
+              "title": "어떤 장르의 게임을 선호하시나요?",
+              "thumbnail": {
+                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FBjhPu%2FbtsHzDCsgQ2%2F5TaUxGxVbNT4OUFzoWE5d0%2Fimg.jpg"
+              },
+              "buttons": [
+                {
+                  "action": "message",
+                  "label": "🤼‍♂️액션",
+                  "messageText": "액션"
+                },
+                {
+                  "action":  "message",
+                  "label": "🗻어드벤처",
+                  "messageText": "어드벤처"
+                },
+                {
+                  "action":  "message",
+                  "label": "🍄RPG",
+                  "messageText": "RPG"
+                }
+              ]
+            },
+            {
+              "title": "어떤 장르의 게임을 선호하시나요?",
+              "thumbnail": {
+                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbMo4yv%2FbtsHANjLtIz%2FrIjhFWDvI2xMqqiyIOthq0%2Fimg.jpg"
+              },
+              "buttons": [
+                {
+                  "action": "message",
+                  "label": "🎲퍼즐",
+                  "messageText": "퍼즐"
+                },
+                {
+                  "action":  "message",
+                  "label": "⚽스포츠",
+                  "messageText": "스포츠"
+                },
+                {
+                  "action":  "message",
+                  "label": "🔫슈팅",
+                  "messageText": "슈팅"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+    return jsonify(response)
+# -------------------------------------------------------------------------------------------------------------------------------------
+@bp.route('/step5_gamesuggest', methods=['POST'])
+def step5_gamesuggest():
+    global step1_platform, step2_players, step3_difficulty, step4_category, conn
+    body = request.get_json()
+
+    # 'utterance' 값 가져오기
+    step4_category = body['userRequest']['utterance']
+    print(f'step4_category : {step4_category}')
+
+    # SQL문
+    cursor = conn.cursor()
+    sql = "SELECT * FROM gamesuggest WHERE platform = %s AND players = %s AND game_difficulty = %s AND game_category = %s"
+    cursor.execute(sql, (step1_platform, step2_players, step3_difficulty, step4_category))
+    suppliers = cursor.fetchall()
+
+    # 터미널 출력 확인용
+    for supplier in suppliers:
+        print(supplier)
+
+    random_suppliers = random.sample(suppliers, k=3)  # suppliers 리스트에서 랜덤하게 3개의 항목을 선택
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                "simpleText": {
+                    "text": f"알겠습니다. 그러면 {step1_platform}에서 {step2_players} 즐길 수 있는 {step3_difficulty} 난이도의 {step4_category} 게임을 추천해드릴게요."
+                }
+            },
+            {
+                    "carousel": {
+                        "type": "basicCard",
+                        "items": [
+                            {
+                                "title": random_suppliers[0]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[0]['platform']}, 장르: {random_suppliers[0]['game_category']}, 난이도: {random_suppliers[0]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F5is5P%2FbtsHAwvMMz5%2FyzYPVs9ywZG1cxz2bMraL0%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": random_suppliers[1]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[1]['platform']}, 장르: {random_suppliers[1]['game_category']}, 난이도: {random_suppliers[1]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdlFnmf%2FbtsHzck2Nnj%2FAaN4sQu8NJQI521KIIpGIK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": random_suppliers[2]['game_name'],
+                                "description": f"플랫폼: {random_suppliers[2]['platform']}, 장르: {random_suppliers[2]['game_category']}, 난이도: {random_suppliers[2]['game_difficulty']}",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fbz918Y%2FbtsHz7J4CBY%2Fm3vQCTxHSjqEz12eKfNEiK%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "webLink",
+                                        "label": "다운로드",
+                                        "messageText": "https://chatbot.kakao.com/docs/getting-started-overview/"
+                                    },
+                                    {
+                                        "action":  "webLink",
+                                        "label": "게임 사이트",
+                                        "webLinkUrl": "https://e.kakao.com/t/hello-ryan"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+              {
+                "messageText": "처음으로",
+                "action": "message",
+                "label": "처음으로"
+              },
+              {
+                "messageText": "다시 게임 추천 받기",
+                "action": "message",
+                "label": "다시 게임 추천 받기"
+              }
+            ]
+        }
+    }
+    # JSON 형식으로 변환하여 반환
+    return jsonify(response)

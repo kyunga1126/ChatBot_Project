@@ -1,0 +1,162 @@
+# 게임 추천 기능_step1_현준
+
+# mysqlclient 설치하여 MySQLdb 호출
+import pymysql
+import random
+
+# flask에 있는 request와 Bluepoint 호출
+from flask import Blueprint, request, Flask, jsonify
+
+# MySQL 객체 등록
+conn = pymysql.connect(
+    host="52.78.100.77",
+    port=54201,
+    db='friendly',
+    user='root',
+    password='12345',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+# 블루프린트 객체 등록
+bp = Blueprint('pltoo_point', __name__, url_prefix='/')
+# ------------------------------------------------------------------------------------------------------------------------------
+# 등급별 사용자 조회 함수
+@bp.route('/step1_point', methods=['POST'])
+def step1_point():
+    body = request.get_json()
+
+    # 'utterance' 값 가져오기
+    rank = body['userRequest']['utterance']
+    print(f'사용자 등급은 : {rank}')
+
+    response = {
+      "version": "2.0",
+      "template": {
+        "outputs": [
+          {
+            "carousel": {
+              "type": "basicCard",
+              "items": [
+                {
+                  "title": "조회할 등급을 선택해주세요.",
+                  "thumbnail": {
+                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png"
+                  },
+                  "buttons": [
+                    {
+                      "action": "message",
+                      "label": "💎VIP",
+                      "messageText": "VIP"
+                    },
+                    {
+                      "action":  "message",
+                      "label": "🥇골드",
+                      "messageText": "골드"
+                    }
+                  ]
+                },
+                {
+                  "title": "조회할 등급을 선택해주세요.",
+                  "thumbnail": {
+                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png"
+                  },
+                  "buttons": [
+                    {
+                      "action": "message",
+                      "label": "🥈실버",
+                      "messageText": "실버"
+                    },
+                    {
+                      "action":  "message",
+                      "label": "🥉브론즈",
+                      "messageText": "브론즈"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+    return jsonify(response)
+
+# ------------------------------------------------------------------------------------------------------------------------------
+@bp.route('/step2_point', methods=['POST'])
+def step2_point():
+    body = request.get_json()
+    
+    # 'utterance' 값 가져오기
+    rank = body['userRequest']['utterance']
+    print(f'사용자 등급은 : {rank}')
+
+    # SQL문
+    cursor = conn.cursor()
+     # 나이대를 키(key)로 하고, 각 나이대에 대한 SQL 조건문을 값(value)으로 갖고있다.
+    sql = {
+        '브론즈': "SELECT * FROM class WHERE point < 500",
+        '실버': "SELECT * FROM class WHERE point >= 500 AND point < 1000",
+        '골드': "SELECT * FROM class WHERE point >= 1000 AND point < 1500",
+        'VIP': "SELECT * FROM class WHERE point >= 1500"
+    }.get(rank, 'point < 0')
+    print(f'완성된 sql문은 {sql}')
+    cursor.execute(sql)
+    suppliers = cursor.fetchall()
+
+    # 터미널 출력 확인용
+    for supplier in suppliers:
+        print(supplier)
+
+    # suppliers 리스트에서 랜덤하게 3개의 항목을 선택
+    random_suppliers = random.sample(suppliers, k=3)
+
+    response = {
+      "version": "2.0",
+      "template": {
+        "outputs": [
+          {
+            "carousel": {
+              "type": "listCard",
+              "items": [
+                {
+                  "header": {
+                    "title": f"회원 등급 : {rank}"
+                  },
+                  "items": [
+                    {
+                      "title": random_suppliers[0]['name'],
+                      "description": f"포인트 : {random_suppliers[0]['point']}",
+                      "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png"
+                    },
+                    {
+                      "title": random_suppliers[1]['name'],
+                      "description": f"포인트 : {random_suppliers[1]['point']}",
+                      "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png"
+                    },
+                    {
+                      "title": random_suppliers[2]['name'],
+                      "description": f"포인트 : {random_suppliers[2]['point']}",
+                      "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "quickReplies": [
+          {
+            "messageText": "처음으로",
+            "action": "message",
+            "label": "처음으로"
+          },
+          {
+            "messageText": "다시 포인트 조회하기",
+            "action": "message",
+            "label": "다시 포인트 조회하기"
+          }
+        ]
+      }
+    }
+    return jsonify(response)

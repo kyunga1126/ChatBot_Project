@@ -1,0 +1,166 @@
+# 성별 선택
+@application.route('/step1_friend', methods=['POST'])
+def step1_friend():
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "textCard": {
+                        "title": "친구를 찾아볼까요?",
+                        "description": "어떤 친구를 찾아볼까요?. \n 성별을 선택해 주세요!",
+                        "buttons": [
+                            {
+                                "action": "message",
+                                "label": "여자",
+                                "messageText": "여자"
+                            },
+                            {
+                                "action": "message",
+                                "label": "남자",
+                                "messageText": "남자"
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 나이대 선택
+@application.route('/step2_friend', methods=['POST'])
+def step2_friend():
+    global gender
+    body = request.get_json()
+    gender = body['userRequest']['utterance']  # 성별 선택된 값
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "carousel": {
+                        "type": "textCard",
+                        "items": [
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "10대",
+                                        "messageText": "10대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "20대",
+                                        "messageText": "20대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "30대",
+                                        "messageText": "30대"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "40대",
+                                        "messageText": "40대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "50대",
+                                        "messageText": "50대"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 친구 추천 기능
+def get_recommended_friends():
+    global gender, age_group, conn
+    body = request.get_json()
+    age_group = body['userRequest']['utterance'].strip()  # 나이 선택된 값
+
+    cursor = conn.cursor()
+
+    age_group_query = {
+        '10대': 'age >= 10 AND age < 20',
+        '20대': 'age >= 20 AND age < 30',
+        '30대': 'age >= 30 AND age < 40',
+        '40대': 'age >= 40 AND age < 50',
+        '50대': 'age >= 50 AND age < 60'
+    }.get(age_group, 'age >= 0')
+
+    gender_query = 'F' if gender == '여자' else 'M'
+    
+    sql = "SELECT name FROM customer WHERE gender = %s AND " + age_group_query
+    cursor.execute(sql, (gender_query,))
+    suppliers = cursor.fetchall()
+
+    result = [supplier[0] for supplier in suppliers][:6]
+    recommended_friends = random.sample(result, len(result))
+
+    friend_details = {}
+    for name in recommended_friends:
+        # Get games and age
+        cursor.execute("SELECT game_name, age FROM customer WHERE name = %s", (name,))
+        data = cursor.fetchone()
+        if data:
+            game_name, age = data
+            friend_details[name] = {'games': game_name, 'age': age}
+
+    cursor.close()
+    return recommended_friends, friend_details
+
+
+@application.route('/step3_friend', methods=['POST'])
+def step3_friend():
+    recommended_friends, friend_details = get_recommended_friends()
+    return jsonify(recommended_friends, friend_details)
+
+
+@application.route('/step4_friend', methods=['POST'])
+def step4_friend():
+    recommended_friends, friend_details = get_recommended_friends()
+
+    items = []
+    for friend in recommended_friends[:3]:
+        details = friend_details[friend]
+        items.append({
+            "title": f"닉네임: {friend}",
+            "description": f"# {details['games']} #{details['age']}살 #{gender}",
+            "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+            "link": {
+                "web": "https://www.naver.com"
+            }
+        })
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "친구를 추천해줄게"
+                        },
+                        "items": items
+                    }
+                }
+            ]
+        }
+    }
+    return responseBody

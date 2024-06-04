@@ -1,0 +1,505 @@
+from flask import Flask, request, jsonify
+import sys
+import flask
+import pymysql
+import random
+import datetime
+
+# Database connection setup
+conn = pymysql.connect(
+    host="52.79.75.52",
+    port=57431,
+    db='friendly',
+    user='root',
+    password='12345',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+
+application = Flask(__name__)
+
+# 전역 변수 선언
+step1_ask1 = None
+step1_ask2 = None
+step1_ask3 = None
+step2_report1 = None
+step2_report2 = None
+step2_report3 = None
+step3_all = None
+
+
+@application.route('/ask', methods=['POST'])
+def ask():
+    body = request.get_json()
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": "문의사항을 선택해주세요."
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "고객 서비스 및 기술 지원",
+                    "messageText": "고객 서비스 및 기술 지원"
+                },
+                {
+                    "action": "message",
+                    "label": "회원 및 비회원 관련 사항",
+                    "messageText": "회원 및 비회원 관련 사항"
+                },
+                {
+                    "action": "message",
+                    "label": "구매 및 환불 정책",
+                    "messageText": "구매 및 환불 정책"
+                }
+            ]
+        }
+    }
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/ask1', methods=['POST'])
+def ask1():
+    global step1_ask1
+    body = request.get_json()
+
+    step1_ask1 = body['userRequest']['utterance']
+    print(f'step1_ask1 : {step1_ask1}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "고객 서비스 및 기술 지원"
+                        },
+                        "items": [
+                            {
+                                "title": "고객 서비스와 연락하는 방법을 알려주세요.",
+                                "description": "최대한 빨리 연락드릴게요!",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "사이트 이용 중 기술적 문제가 발생했을 때 어떻게 해야 하나요?",
+                                "description": "사이트 이용 중 기술적 문제가 발생했을 때 어떻게 해야 하나요?",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "기술 지원을 받을 수 있는 방법을 알려주세요.",
+                                "description": "기술 지원을 받을 수 있는 방법을 알려주세요.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/ask2', methods=['POST'])
+def ask2():
+    global step1_ask2
+    body = request.get_json()
+
+    step1_ask2 = body['userRequest']['utterance']
+    print(f'step1_ask2 : {step1_ask2}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "회원 및 비회원 관련 사항"
+                        },
+                        "items": [
+                            {
+                                "title": "비회원으로도 구매가 가능한가요?",
+                                "description": "비회원 구매",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "회원 가입 절차에 대해 궁금한 점이 있습니다!",
+                                "description": "회원 가입 절차",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/ask3', methods=['POST'])
+def ask3():
+    global step1_ask3
+    body = request.get_json()
+
+    step1_ask3 = body['userRequest']['utterance']
+    print(f'step1_ask3 : {step1_ask3}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "구매 및 환불 정책"
+                        },
+                        "items": [
+                            {
+                                "title": "개인 정보 보호 정책에 대해 설명해 주세요.",
+                                "description": "개인 정보 보호 정책",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "환불 절차에 대해 알고 싶습니다!",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "description": "환불 절차",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/report', methods=['POST'])
+def report():
+    body = request.get_json()
+
+    step2_report1 = body['userRequest']['utterance']
+    print(f'step2_report1 : {step2_report1}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": "신고사항을 선택해주세요."
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "보안 및 개인 정보 관련",
+                    "messageText": "보안 및 개인 정보 관련"
+                },
+                {
+                    "action": "message",
+                    "label": "고객 서비스 관련",
+                    "messageText": "고객 서비스 관련"
+                },
+                {
+                    "action": "message",
+                    "label": "기술 및 기능 관련",
+                    "messageText": "기술 및 기능 관련"
+                }
+            ]
+        }
+    }
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+@application.route('/report1', methods=['POST'])
+def report1():
+    global step2_report1
+    body = request.get_json()
+
+    step2_report2 = body['userRequest']['utterance']
+    print(f'step2_report2 : {step2_report2}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "보안 및 개인 정보 관련"
+                        },
+                        "items": [
+                            {
+                                "title": "부적절한 사용자 댓글이나 게시물이 있습니다.",
+                                "description": "부적절한 사용자 댓글이나 게시물이 있습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "개인 정보가 무단으로 사용된 것 같습니다.",
+                                "description": "개인 정보가 무단으로 사용된 것 같습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "사이트에서 사기성 결제를 경험했습니다.",
+                                "description": "사이트에서 사기성 결제를 경험했습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/report2', methods=['POST'])
+def report2():
+    global step2_report2
+    body = request.get_json()
+
+    step2_report3 = body['userRequest']['utterance']
+    print(f'step2_report3 : {step2_report3}')
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "고객 서비스 관련"
+                        },
+                        "items": [
+                            {
+                                "title": "고객 서비스 응대가 불친절하거나 부적절했습니다.",
+                                "description": "고객 서비스 응대가 불친절하거나 부적절했습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/report3', methods=['POST'])
+def report3():
+    global step2_report3
+    body = request.get_json()
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "기술 및 기능 관련"
+                        },
+                        "items": [
+                            {
+                                "title": "사이트의 특정 기능이 제대로 작동하지 않습니다.",
+                                "description": "사이트의 특정 기능이 제대로 작동하지 않습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            },
+                            {
+                                "title": "사이트에서 명예 훼손적인 내용을 발견했습니다.",
+                                "description": "사이트에서 명예 훼손적인 내용을 발견했습니다.",
+                                "imageUrl" :"https://e.kakao.com/t/zanmang-loopy-ver-3?t_ch=webstore&t_obj=web_main_banner#",
+                                "link": {
+                                    "web": "https://www.naver.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": "message",
+                    "label": "처음",
+                    "messageText": "처음"
+                }
+            ]
+        }
+    }
+
+
+
+    return jsonify(responseBody)
+# ---------------------------------------------------------------------------------------------------
+
+@application.route('/insert', methods=['POST'])
+def insert():
+    global step1_ask1, step1_ask2, step1_ask3, step2_report1
+    global step2_report2, step2_report3, step3_all, conn
+    body = request.get_json()
+
+    # 'utterance' 값 가져오기
+    step3_all = body['userRequest']['utterance']
+    print(f'step3_all : {step3_all}')
+
+    try:
+        # SQL문
+        cursor = conn.cursor()
+
+        # Auto-increment bno
+        cursor.execute("SELECT MAX(bno) AS max_bno FROM customer_ask")
+        result = cursor.fetchone()
+        bno = result['max_bno'] + 1 if result['max_bno'] is not None else 1
+
+        # id와 readCount를 입력
+        id = body['userRequest']['user']['id']
+        readCount = 0
+        date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # 데이터 삽입
+        sql = "INSERT INTO customer_ask (bno, id, ask, report, readCount, date) values (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(sql, (bno, id, step1_ask1, step3_all, readCount, date))
+        conn.commit()
+
+        responseBody = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                            "text": (
+                                f"감사합니다. 답변해주신 {step1_ask1}, {step1_ask2}, {step1_ask3} "
+                                f"그리고 신고하신 {step2_report1}, {step2_report2}, {step2_report3} "
+                                "에 저희가 신경써서 관리하겠습니다."
+                            )
+                        }
+                    }
+                ]
+            }
+        }
+
+    except Exception as e:
+        # 오류가 발생하면 롤백
+        conn.rollback()
+        print(f"Error: {str(e)}")
+
+        # 오류 응답 메시지
+        responseBody = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                            "text": "데이터베이스에 데이터를 삽입하는 중 오류가 발생했습니다."
+                        }
+                    }
+                ]
+            }
+        }
+
+    finally:
+        # 커서 닫기
+        cursor.close()
+
+    return jsonify(responseBody)
+
+if __name__ == '__main__':
+    application.run(host="0.0.0.0", port=80)

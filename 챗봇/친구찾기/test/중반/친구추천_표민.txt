@@ -1,0 +1,201 @@
+# flask에 있는 request와 Bluepoint 호출
+from flask import Flask, request, jsonify, Blueprint
+import pymysql
+import random
+
+# Database connection setup
+conn = pymysql.connect(
+    host="13.124.3.95", 
+    port=53140, 
+    db='friendly', 
+    user='root', 
+    password='12345',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+
+application = Flask(__name__)
+
+# 블루프린트 객체 등록
+bp = Blueprint('pltoo_recommend', __name__, url_prefix='/')
+
+
+# 전역 변수 선언
+
+gender = None
+age_group = None
+
+
+# 성별 선택_민
+
+#url 설정
+@bp.route('/step1_friend', methods=['POST'])
+def step1_friend():
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "textCard": {
+                        "title": "친구를 찾아볼까요?",
+                        "description": "어떤 친구를 찾아볼까요?. \n 성별을 선택해 주세요!",
+                        "buttons": [
+                            {
+                                "action": "message",
+                                "label": "여자",
+                                "messageText": "여자"
+                            },
+                            {
+                                "action": "message",
+                                "label": "남자",
+                                "messageText": "남자"
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 나이대 선택
+@bp.route('/step2_friend', methods=['POST'])
+def step2_friend():
+    global gender
+    body = request.get_json()
+    gender = body['userRequest']['utterance']  # 성별 선택된 값
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "carousel": {
+                        "type": "textCard",
+                        "items": [
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "10대",
+                                        "messageText": "10대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "20대",
+                                        "messageText": "20대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "30대",
+                                        "messageText": "30대"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "친구를 찾아볼까요?💗",
+                                "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "40대",
+                                        "messageText": "40대"
+                                    },
+                                    {
+                                        "action": "message",
+                                        "label": "50대",
+                                        "messageText": "50대"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return response
+
+# 친구 추천 기능
+def get_recommended_friends():
+    
+    # 전역변수 선언
+    global gender, age_group, conn
+    
+    # HTTP 요청의 본문을 JSON 형식으로 파싱하여 body 변수에 저장
+    body = request.get_json()
+    
+    
+    age_group = body['userRequest']['utterance'].strip()  # 나이 선택된 값
+
+    cursor = conn.cursor()
+
+    # 나이대를 키(key)로 하고, 각 나이대에 대한 SQL 조건문을 값(value)으로 갖고있다.
+    age_group_query = {
+        '10대': 'age >= 10 AND age < 20',
+        '20대': 'age >= 20 AND age < 30',
+        '30대': 'age >= 30 AND age < 40',
+        '40대': 'age >= 40 AND age < 50',
+        '50대': 'age >= 50 AND age < 60'
+    }.get(age_group, 'age >= 0')
+
+    gender_query = 'F' if gender == '여자' else 'M'
+
+    # 고객의 이름(name), 게임 이름(game_name), 나이(age)를 선택하는 쿼리
+    sql = "SELECT name, game_name, age FROM customer WHERE gender = %s AND " + age_group_query
+    cursor.execute(sql, (gender_query,))
+    
+    #데이터 변수에 모두 저장
+    data = cursor.fetchall()
+
+    # data의 요소들을 무작위로 섞은 새로운 리스트
+    recommended_friends = random.sample(data, len(data))
+
+    # 고객의 이름을 키로, 게임이름과 나이를 값으로 하는 딕셔너리 생성
+    friend_details = {person['name']: {'games': person['game_name'], 'age': person['age']} for person in recommended_friends}
+
+    cursor.close()
+    
+    # 두개의 값을 반환
+    #1. recommended_friends 리스트에서 각 고객의 이름을 추출한 리스트
+    #2. 고객의 상세 정보를 담고 있는 friend_details 딕셔너리
+    return [person['name'] for person in recommended_friends], friend_details
+
+
+
+@bp.route('/step4_friend', methods=['POST'])
+def step4_friend():
+    recommended_friends, friend_details = get_recommended_friends()
+
+    items = []
+    for friend in recommended_friends[:3]:
+        details = friend_details[friend]
+        items.append({
+            "title": f"닉네임: {friend}",
+            "description": f"# {details['games']} #{details['age']}살 #{gender}",
+            "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+            "link": {
+                "web": "https://www.naver.com"
+            }
+        })
+
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "listCard": {
+                        "header": {
+                            "title": "친구를 추천해줄게"
+                        },
+                        "items": items
+                    }
+                }
+            ]
+        }
+    }
+    return responseBody
+

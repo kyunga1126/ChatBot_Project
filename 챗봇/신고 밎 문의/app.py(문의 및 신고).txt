@@ -1,0 +1,56 @@
+import MySQLdb
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+def db_conn():
+    return MySQLdb.connect(
+        host="13.209.133.210", 
+        port=58984, 
+        db='friendly', 
+        user='root', 
+        password='12345'
+    )
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    data = request.json
+    id = data.get('id')
+    ask = data.get('ask')
+    readCount = data.get('readCount', 0)  # Default to 0 if not provided
+    date = data.get('date')
+    
+    conn = db_conn()
+    cursor = conn.cursor()
+
+    ask_sql = "INSERT INTO customer_ask (id, ask, report, readCount, date) VALUES (%s, %s, null, %s, %s)"
+    cursor.execute(ask_sql, (id, ask, readCount, date))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return jsonify({'status': 'success', 'message': 'Ask inserted successfully'}), 201
+
+@app.route('/report', methods=['POST'])
+def report():
+    data = request.json
+    id = data.get('id')
+    report = data.get('report')
+    readCount = data.get('readCount', 0)  # Default to 0 if not provided
+    date = data.get('date')
+    
+    conn = db_conn()
+    cursor = conn.cursor()
+
+    report_sql = "INSERT INTO customer_ask (id, ask, report, readCount, date) VALUES (%s, null, %s, %s, %s)"
+    cursor.execute(report_sql, (id, report, readCount, date))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return jsonify({'status': 'success', 'message': 'Report inserted successfully'}), 201
+
+if __name__ == '__main__':
+    app.run(debug=True)

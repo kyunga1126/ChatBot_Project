@@ -1,0 +1,70 @@
+# 시작 코드_공통
+
+# flask에 있는 request와 Bluepoint 호출
+from flask import Blueprint, request, Flask, jsonify
+
+# 블루프린트 객체 등록
+bp = Blueprint('start', __name__, url_prefix='/')
+
+@bp.route('/start', methods=['POST'])
+def start():
+    body = request.get_json()
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+            {
+                    "carousel": {
+                        "type": "basicCard",
+                        "items": [
+                            {
+                                "title": "안녕하세요! 플투 챗봇입니다.",
+                                "description": "다양한 기능들을 제공하고 있습니다. \n어떤 기능을 원하시나요?",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fc6zoNX%2FbtsHAwcwEYd%2FBh5rQbeJeg6tfDaJiKsXP1%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "👩🏼‍🤝‍🧑🏻친구 찾기👬",
+                                        "messageText": "친구 찾기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "🎮게임 추천 받기",
+                                        "messageText": "게임 추천 받기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "💰포인트 조회",
+                                        "messageText": "포인트 조회"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "안녕하세요! 플투 챗봇입니다.",
+                                "description": "다양한 기능들을 제공하고 있습니다. \n어떤 기능을 원하시나요?",
+                                "thumbnail": {
+                                    "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcjAIEb%2FbtsHB4ewzbc%2F2eQDvHDMsrlNk0xFxnhi51%2Fimg.png"
+                                },
+                                "buttons": [
+                                    {
+                                        "action": "message",
+                                        "label": "💬자주 묻는 질문 보기",
+                                        "messageText": "자주 묻는 질문 보기"
+                                    },
+                                    {
+                                        "action":  "message",
+                                        "label": "📞문의 및 신고 하기",
+                                        "messageText": "문의 및 신고 하기"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    return jsonify(response)

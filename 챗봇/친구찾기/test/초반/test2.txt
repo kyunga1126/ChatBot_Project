@@ -1,0 +1,41 @@
+import MySQLdb
+import random
+from datetime import datetime
+
+# MySQL 데이터베이스 연결
+conn = MySQLdb.connect(host="localhost", port=3308, db='friendly', user='root', password='12345')
+cursor = conn.cursor()
+
+# 랜덤한 point 생성 함수 (0 또는 500)
+def generate_point():
+    return random.choice([0,500])
+
+try:
+    # customer 테이블에서 아이디를 가져옴
+    cursor.execute("SELECT id FROM customer")
+    customer_ids = cursor.fetchall()
+
+    # 각 아이디에 대해 중복으로 customer_event 테이블에 데이터 삽입
+    for customer_id in customer_ids:
+        id_value = customer_id[0]
+        point = generate_point()
+        date = datetime.now().strftime('%Y-%m-%d')
+        
+        # customer_event 테이블에 삽입하는 SQL 쿼리
+        sql = "INSERT INTO customer_event (id, point, date) VALUES (%s, %s, %s)"
+        values = (id_value, point, date)
+        
+        # SQL 쿼리 실행
+        cursor.execute(sql, values)
+
+    # 변경사항을 커밋
+    conn.commit()
+
+    print("데이터가 성공적으로 삽입되었습니다.")
+except Exception as e:
+    print("데이터 삽입 중 오류 발생:", e)
+    conn.rollback()  # 롤백하여 데이터베이스를 이전 상태로 되돌림
+finally:
+    # 연결 및 커서 닫기
+    cursor.close()
+    conn.close()

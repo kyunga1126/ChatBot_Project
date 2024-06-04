@@ -1,0 +1,216 @@
+import MySQLdb
+
+from flask import Flask, request, jsonify
+
+import random
+
+
+
+app = Flask(__name__)
+
+
+
+def get_friend_games():
+
+    conn = MySQLdb.connect(host="localhost", port=3306, db='friendly', user='root', password='12345')
+
+    cursor = conn.cursor()
+
+
+
+    sql = "SELECT name FROM customer WHERE gender = 'F' AND age >= 10 AND age < 20"
+
+    cursor.execute(sql)
+
+    suppliers = cursor.fetchall()
+
+    result = []
+
+
+
+    for supplier in suppliers:
+
+        output = []
+
+        for i in range(len(supplier)):
+
+            output.append(str(supplier[i]))
+
+            result = result + output
+
+
+
+    result = result[:6]
+
+    str3 = random.sample(result, len(result))
+
+
+
+    friend_games = {}
+
+    friend_age = {}
+
+
+
+    for name in str3:
+
+        # Get games
+
+        mysql = "SELECT game_name FROM customer WHERE name = %s"
+
+        cursor.execute(mysql, (name,))
+
+        games = cursor.fetchall()
+
+        game_name = [game[0] for game in games]
+
+        friend_games[name] = game_name
+
+
+
+        # Get age
+
+        msql = "SELECT age FROM customer WHERE name = %s"
+
+        cursor.execute(msql, (name,))
+
+        ages = cursor.fetchall()
+
+        age_in = [str(age[0]) for age in ages]
+
+        friend_age[name] = age_in
+
+
+
+    cursor.close()
+
+    conn.close()
+
+    return str3, friend_games, friend_age
+
+
+
+@app.route('/power', methods=['POST'])
+
+def friend():
+
+    str3, friend_games, friend_age = get_friend_games()
+
+
+
+    descriptions = []
+
+    for i in range(min(3, len(str3))):
+
+        friend_name = str3[i]
+
+        games_list = friend_games.get(friend_name, [])
+
+        description = ', '.join(games_list)
+
+        descriptions.append(description)
+
+
+
+    final_ages = []
+
+    for i in range(min(3, len(str3))):
+
+        friend_in = str3[i]
+
+        age_list = friend_age.get(friend_in, [])
+
+        final_age = ', '.join(age_list)
+
+        final_ages.append(final_age)
+
+
+    responseBody = {
+
+        "version": "2.0",
+
+        "template": {
+
+            "outputs": [
+
+                {
+
+                    "listCard": {
+
+                        "header": {
+
+                            "title": "친구를 추천해줄게"
+
+                        },
+
+                        "items": [
+
+                            {
+
+                                "title": "닉네임: " + str3[0],
+
+                                "description": "# " + descriptions[0] + " #" + final_ages[0] + "살 #여자",
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[1],
+
+                                "description": "# " + descriptions[1] + " #" + final_ages[1] + "살 #여자",
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[2],
+
+                                "description": "# " + descriptions[2] + " #" + final_ages[2] + "살 #여자",
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            }
+
+                        ]
+
+                    }
+
+                }
+
+            ]
+
+        }
+
+    }
+
+
+
+    return jsonify(responseBody)
+
+
+
+if __name__ == '__main__':
+
+    app.run(host="0.0.0.0", port=80)  # 웹 서버 실행

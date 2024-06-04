@@ -1,0 +1,4 @@
+mysqlclient 설치 안될시 참고 사이트 : https://yenoss.github.io/2017/09/11/pythonMysql_conf.html
+mysql 재시작 : https://seong6496.tistory.com/324#google_vignette
+초기 패스워드 설정 : mysql -u root -p
+mysql 외부 권한 부여 : https://yourusername.tistory.com/378, https://fruitdev.tistory.com/206

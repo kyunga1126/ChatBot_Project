@@ -1,0 +1,2 @@
+MySQL 권한 부여 : https://cjh5414.github.io/mysql-create-user/
+카카오챗봇 : https://givemethesocks.tistory.com/86

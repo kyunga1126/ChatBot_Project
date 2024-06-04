@@ -1,0 +1,362 @@
+# mysqlclient 설치하여 MySQLdb 호출
+import MySQLdb
+import sys
+
+# flask에 있는 request와 Bluepoint 호출
+from flask import Blueprint, request, jsonify
+
+# MySQL 객체 등록
+conn = MySQLdb.connect(
+    host="52.78.100.77",
+    port=54201,
+    db='friendly',
+    user='root',
+    password='12345',
+    charset='utf8mb4'
+)
+cursor = conn.cursor()
+
+# 블루프린트 객체 등록
+bp = Blueprint('pltoo_question', __name__, url_prefix='/')
+
+# url 설정
+@bp.route('/question', methods=['POST'])
+def questionstart():
+    # 카카오챗봇에서 발화문 가져오기
+    body = request.get_json()
+    body=body['userRequest']['utterance']
+    
+    print('body의 결과는', body)
+
+    # 챗봇 출력 시 textcard 설정
+    responseBody={
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                "textCard": {
+                    "title": "질문 유형을 선택하세요",
+                    "description": "",
+                    "buttons": [
+                        {
+                        "action": "message",
+                        "label": "계정",
+                        "messageText": "계정"
+                        },
+                        {
+                        "action": "message",
+                        "label": "게임친구",
+                        "messageText": "게임친구"
+                        },
+                        {
+                        "action": "message",
+                        "label": "기타",
+                        "messageText": "기타"
+                        }
+                    ]
+                }
+                }
+            ]
+        }
+    }
+    return responseBody
+
+# ---------------------------------------------------------------------------------------------------------
+# url 설정
+@bp.route('/question/friend', methods=['POST'])
+def questionfriends():
+    # 카카오챗봇에서 발화문 가져오기
+    body = request.get_json()
+    body=body['userRequest']['utterance']
+    print('body의 결과는', body)
+    
+    # 챗봇 입력 결과가 게임친구일 때, DB에서 kind가 friend인 질문을 출력
+    sql = 'select ask from question where kind="friend" order by read_count desc'
+    cursor.execute(sql)
+    suppliers = cursor.fetchall()
+    result=[]
+
+    # sql 결과값을 리스트로 처리
+    for supplier in suppliers:
+        output = []
+        for i in range(len(supplier)):
+            output.append(str(supplier[i]))
+            result=result+output
+
+    # 리스트 각 요소를 설정
+    result0=result[0]
+    result1=result[1]
+    result2=result[2]
+
+    # 리스트를 문자열로 변환
+    str1 = ''.join(result0)
+    str2 = ''.join(result1)
+    str3 = ''.join(result2)
+
+    # DB에서 답변을 출력
+    sql = 'select answer from question where kind="friend" order by read_count desc'
+    cursor.execute(sql)
+    suppliers = cursor.fetchall()
+    result=[]
+
+    for supplier in suppliers:
+        output = []
+        for i in range(len(supplier)):
+            output.append(str(supplier[i]))
+            result=result+output
+
+    result0=result[0]
+    result1=result[1]
+    result2=result[2]
+
+    str4 = ''.join(result0)
+    str5 = ''.join(result1)
+    str6 = ''.join(result2)
+
+    # 챗봇 출력 시 캐러셀 설정
+    responseBody = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "carousel": {
+                        "type": "listCard",
+                        "items": [
+                            {
+                                "header": {
+                                    "title": str1
+                                },
+                                "items": [
+                                    {
+                                        "description": str4
+                                    }
+                                ]
+                            },
+                            {
+                                "header": {
+                                    "title": str2
+                                },
+                                "items": [
+                                    {
+                                        "description": str5
+                                    }
+                                ]
+                            },
+                            {
+                                "header": {
+                                    "title": str3
+                                },
+                                "items": [
+                                    {
+                                        "description": str6
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+
+    return responseBody
+
+# -------------------------------------------------------------------------------------------------
+# url 설정
+@bp.route('/question/other', methods=['POST'])
+def questionother():
+    # 카카오챗봇에서 발화문 가져오기
+    body = request.get_json()
+    body=body['userRequest']['utterance']
+    print('body의 결과는', body)
+    
+    # 챗봇 입력 결과가 기타일 때, DB에서 kind가 other인 질문을 출력
+    if body=="기타":
+        sql = 'select ask from question where kind="other" order by read_count desc'
+        cursor.execute(sql)
+        suppliers = cursor.fetchall()
+        result=[]
+
+        # sql 결과값을 리스트로 처리
+        for supplier in suppliers:
+            output = []
+            for i in range(len(supplier)):
+                output.append(str(supplier[i]))
+                result=result+output
+        
+        # 리스트 각 요소를 설정
+        result0=result[0]
+        result1=result[1]
+        result2=result[2]
+        
+        # 리스트를 문자열로 변환
+        str1 = ''.join(result0)
+        str2 = ''.join(result1)
+        str3 = ''.join(result2)
+        
+        # DB에서 답변을 출력
+        sql = 'select answer from question where kind="other" order by read_count desc'
+        cursor.execute(sql)
+        suppliers = cursor.fetchall()
+        result=[]
+
+        for supplier in suppliers:
+            output = []
+            for i in range(len(supplier)):
+                output.append(str(supplier[i]))
+                result=result+output
+
+        result0=result[0]
+        result1=result[1]
+        result2=result[2]
+        
+        str4 = ''.join(result0)
+        str5 = ''.join(result1)
+        str6 = ''.join(result2)
+        
+        # 챗봇 출력 시 캐러셀 설정
+        responseBody={
+            "version": "2.0",
+            "template": {
+            "outputs": [
+                {
+                "carousel": {
+                    "type": "listCard",
+                    "items": [
+                    {
+                        "header": {
+                            "title": str1
+                        },
+                        "items": [
+                        {
+                            "description": str4
+                        }
+                        ]
+                    },
+                    {
+                        "header": {
+                            "title": str2
+                        },
+                        "items": [
+                        {
+                            "description": str5
+                        }
+                        ]
+                    },
+                    {
+                        "header": {
+                            "title": str3
+                        },
+                        "items": [
+                        {
+                            "description": str6
+                        }
+                        ]
+                    }
+                    ]
+                }
+                }
+            ]
+            }
+        }
+    return responseBody
+
+# --------------------------------------------------------------------------------------------------------------
+# url 설정
+@bp.route('/question/user', methods=['POST'])
+def questionusers():
+    # 카카오챗봇에서 발화문 가져오기
+    body = request.get_json()
+    body=body['userRequest']['utterance']
+    print('body의 결과는', body)
+    
+    # 챗봇 입력 결과가 계정일 때, DB에서 kind가 user인 질문을 출력
+    if body=="계정":
+        sql = 'select ask from question where kind="user" order by read_count desc'
+        cursor.execute(sql)
+        suppliers = cursor.fetchall()
+        result=[]
+
+        # sql 결과값을 리스트로 처리
+        for supplier in suppliers:
+            output = []
+            for i in range(len(supplier)):
+                output.append(str(supplier[i]))
+                result=result+output
+
+        # 리스트 각 요소를 설정
+        result0=result[0]
+        result1=result[1]
+        result2=result[2]
+        
+        # 리스트를 문자열로 변환
+        str1 = ''.join(result0)
+        str2 = ''.join(result1)
+        str3 = ''.join(result2)
+        
+        # DB에서 답변을 출력
+        sql = 'select answer from question where kind="user" order by read_count desc'
+        cursor.execute(sql)
+        suppliers = cursor.fetchall()
+        result=[]
+
+        for supplier in suppliers:
+            output = []
+            for i in range(len(supplier)):
+                output.append(str(supplier[i]))
+                result=result+output
+
+        result0=result[0]
+        result1=result[1]
+        result2=result[2]
+        
+        str4 = ''.join(result0)
+        str5 = ''.join(result1)
+        str6 = ''.join(result2)
+        
+         # 챗봇 출력 시 캐러셀 설정
+        responseBody={
+            "version": "2.0",
+            "template": {
+            "outputs": [
+                {
+                "carousel": {
+                    "type": "listCard",
+                    "items": [
+                    {
+                        "header": {
+                            "title": str1
+                        },
+                        "items": [
+                        {
+                            "description": str4
+                        }
+                        ]
+                    },
+                    {
+                        "header": {
+                            "title": str2
+                        },
+                        "items": [
+                        {
+                            "description": str5
+                        }
+                        ]
+                    },
+                    {
+                        "header": {
+                            "title": str3
+                        },
+                        "items": [
+                        {
+                            "description": str6
+                        }
+                        ]
+                    }
+                    ]
+                }
+                }
+            ]
+            }
+        }
+    return responseBody

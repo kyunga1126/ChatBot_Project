@@ -1,0 +1,406 @@
+from flask import Flask, request
+
+import random
+
+import MySQLdb
+
+
+
+gender = None
+
+age_group = None
+
+
+
+application = Flask(__name__)
+
+
+
+conn = MySQLdb.connect(host="localhost", port=3306, db='friendly', user='root', password='12345')
+
+
+
+# 성별 선택
+
+@application.route('/start02', methods=['POST'])
+
+def select_gender():
+
+    response = {
+
+        "version": "2.0",
+
+        "template": {
+
+            "outputs": [
+
+                {
+
+                    "textCard": {
+
+                        "title": "친구를 찾아볼까요?",
+
+                        "description": "어떤 친구를 찾아볼까요?. \n 성별을 선택해 주세요!",
+
+                        "buttons": [
+
+                            {
+
+                                "action": "message",
+
+                                "label": "여자",
+
+                                "messageText": "여자"
+
+                            },
+
+                            {
+
+                                "action": "message",
+
+                                "label": "남자",
+
+                                "messageText": "남자"
+
+                            },
+
+                        ]
+
+                    }
+
+                }
+
+            ]
+
+        }
+
+    }
+
+    return response
+
+
+
+# 나이대 선택
+
+@application.route('/age', methods=['POST'])
+
+def select_age():
+
+    global gender
+
+
+
+    body = request.get_json()
+
+    gender = body['userRequest']['utterance']  # 성별 선택된 값
+
+    
+
+    response = {
+    "version": "2.0",
+    "template": {
+        "outputs": [
+            {
+                "carousel": {
+                    "type": "textCard",
+                    "items": [
+                        {
+                            "title": "친구를 찾아볼까요?💗",
+                            "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                            "buttons": [
+                                {
+                                    "action": "message",
+                                    "label": "10대",
+                                    "messageText": "10대"
+                                },
+                                {
+                                    "action": "message",
+                                    "label": "20대",
+                                    "messageText": "20대"
+                                },
+                                {
+                                    "action": "message",
+                                    "label": "30대",
+                                    "messageText": "30대"
+                                }
+                            ]
+                        },
+                        {
+                            "title": "친구를 찾아볼까요?💗",
+                            "description": "어떤 친구를 찾아볼까요?. \n 나이를 선택해 주세요!",
+                            "buttons": [
+                                {
+                                    "action": "message",
+                                    "label": "40대",
+                                    "messageText": "40대"
+                                },
+                                {
+                                    "action": "message",
+                                    "label": "50대",
+                                    "messageText": "50대"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+    return response
+
+
+
+# 친구 추천 기능
+
+@application.route('/sql', methods=['POST'])
+
+def get_sql():
+
+    global gender, age_group, conn
+
+    
+
+    body = request.get_json()
+
+    age_group = body['userRequest']['utterance'].strip()  # 나이 선택된 값
+
+    
+
+    cursor = conn.cursor()
+
+    
+
+    if age_group == '10대':
+
+        age_group_query = 'age >= 10 AND age < 20'
+
+    elif age_group == '20대':
+
+        age_group_query = 'age >= 20 AND age < 30'
+
+    elif age_group == '30대':
+
+        age_group_query = 'age >= 30 AND age < 40'
+
+    elif age_group == '40대':
+
+        age_group_query = 'age >= 40 AND age < 50'
+
+    elif age_group == '50대':
+
+        age_group_query = 'age >= 50 AND age < 60'
+
+    else:
+
+        # age_group이 우리가 정의한 것과 일치하지 않을 경우 기본값 설정
+
+        age_group_query = 'age >= 0'
+
+
+
+    if gender == '여자':
+
+        gender_query = 'F'
+
+    else:
+
+        gender_query = 'M'
+
+    
+
+    sql = "SELECT name FROM customer WHERE gender = %s AND " + age_group_query
+
+    cursor.execute(sql, (gender_query,))
+
+
+
+    suppliers = cursor.fetchall()
+
+    result = []
+
+
+
+    for supplier in suppliers:
+
+        output = []
+
+        for i in range(len(supplier)):
+
+            output.append(str(supplier[i]))
+
+        result = result + output
+
+
+
+    result = result[:6]
+
+    str3 = random.sample(result, len(result))
+
+
+
+    friend_games = {}
+
+    friend_age = {}
+
+
+
+    for name in str3:
+
+        # Get games
+
+        mysql = "SELECT game_name FROM customer WHERE name = %s"
+
+        cursor.execute(mysql, (name,))
+
+        games = cursor.fetchall()
+
+        game_name = [game[0] for game in games]
+
+        friend_games[name] = game_name
+
+
+
+        # Get age
+
+        msql = "SELECT age FROM customer WHERE name = %s"
+
+        cursor.execute(msql, (name,))
+
+        ages = cursor.fetchall()
+
+        age_in = [str(age[0]) for age in ages]
+
+        friend_age[name] = age_in
+
+
+
+    cursor.close()
+
+    return str3, friend_games, friend_age
+
+
+
+@application.route('/power', methods=['POST'])
+
+def friend():
+
+    str3, friend_games, friend_age = get_sql()
+
+
+
+    descriptions = []
+
+    for i in range(min(3, len(str3))):
+
+        friend_name = str3[i]
+
+        games_list = friend_games.get(friend_name, [])
+
+        description = ', '.join(games_list)
+
+        descriptions.append(description)
+
+
+
+    final_ages = []
+
+    for i in range(min(3, len(str3))):
+
+        friend_in = str3[i]
+
+        age_list = friend_age.get(friend_in, [])
+
+        final_age = ', '.join(age_list)
+
+        final_ages.append(final_age)
+
+
+
+    responseBody = {
+
+        "version": "2.0",
+
+        "template": {
+
+            "outputs": [
+
+                {
+
+                    "listCard": {
+
+                        "header": {
+
+                            "title": "친구를 추천해줄게"
+
+                        },
+
+                        "items": [
+
+                            {
+
+                                "title": "닉네임: " + str3[0],
+
+                                "description": "# " + descriptions[0] + " #" + final_ages[0] + "살 #" + gender,
+
+                                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[1],
+
+                                "description": "# " + descriptions[1] + " #" + final_ages[1] + "살 #" + gender,
+
+                                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[2],
+
+                                "description": "# " + descriptions[2] + " #" + final_ages[2] + "살 #" + gender,
+
+                                "imageUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            }
+
+                        ]
+
+                    }
+
+                }
+
+            ]
+
+        }
+
+    }
+
+    return responseBody
+
+
+
+if __name__ == "__main__":
+
+    application.run(host='0.0.0.0', port=80)

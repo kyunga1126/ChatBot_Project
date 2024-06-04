@@ -1,0 +1,17 @@
+elif outputType == "listCustomer":
+	print(outputType)
+	_ret = { "version": "2.0",
+		"template":{"outputs": [{
+			"listCustomer":{
+				"header":{
+					"title":"listCustomer 테스트"
+		},
+		"items": [
+		{
+			"title": "랜덤 아이디1"
+			"discription":"랜덤 아이디1의 성별, 나이가 나왔으면 좋겠어"
+			"link":{
+				"web": "https://www.naver.com"
+		
+	}
+},

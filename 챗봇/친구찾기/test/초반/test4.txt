@@ -1,0 +1,81 @@
+responseBody = {
+
+        "version": "2.0",
+
+        "template": {
+
+            "outputs": [
+
+                {
+
+                    "listCard": {
+
+                        "header": {
+
+                            "title": "친구를 추천해줄게"
+
+                        },
+
+                        "items": [
+
+                            {
+
+                                "title": "닉네임: " + str3[0],
+
+                                "description": "# " + descriptions[0] + " #" + final_ages[0] + "살 #" + gender,
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[1],
+
+                                "description": "# " + descriptions[1] + " #" + final_ages[1] + "살 #" + gender,
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            },
+
+                            {
+
+                                "title": "닉네임: " + str3[2],
+
+                                "description": "# " + descriptions[2] + " #" + final_ages[2] + "살 #" + gender,
+
+                                "imageUrl": "https://cdn-store.leagueoflegends.co.kr/images/v2/emotes/1499.png",
+
+                                "link": {
+
+                                    "web": "https://www.naver.com"
+
+                                }
+
+                            }
+
+                        ]
+
+                    }
+
+                }
+
+            ]
+
+        }
+
+    }
+
+    return responseBody

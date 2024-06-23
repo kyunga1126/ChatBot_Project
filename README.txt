@@ -7,7 +7,7 @@
 <p align="justify">
 프로젝트 개요/동기
 </p>
-
+https://github.com/pyominmin/ChatBot_Project/blob/main/%ED%94%8C%ED%88%AC.png
 <p align="center">
 
 </p>

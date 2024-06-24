@@ -10,9 +10,9 @@
 
 ## 기술 스택
 
-| Python |
-| :--------: |
-|   ![python](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/100px-Python-logo-notext.svg.png)   |
+| Python | Python |
+| :--------: | :--------: |
+|![python](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/100px-Python-logo-notext.svg.png)|<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA9h4HeUrM518StL4CQ1gnf2lQiIH-DH3xpg&s" width="100px">|
 <br>
 
 ## 구현 기능

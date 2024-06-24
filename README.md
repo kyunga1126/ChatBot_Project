@@ -10,9 +10,9 @@
 
 ## 기술 스택
 
-| Python | MySQL |
-| :--------: | :--------: |
-|![python](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/100px-Python-logo-notext.svg.png)|<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSF9UXfrx8TWM7eyKB1jdIk66ZoGVmTtqWjKQ&s" width="100px">|
+| Python | MySQL | Kakao ChatBot |
+| :--------: | :--------: | :--------: |
+|![python](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/100px-Python-logo-notext.svg.png)|<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSF9UXfrx8TWM7eyKB1jdIk66ZoGVmTtqWjKQ&s" width="100px">|<img src="https://play-lh.googleusercontent.com/cf3DwPLbS8Z55sDvUSTQ6PL1goPdm8KbZ81g4TEUAaeUh5LDhkzdjxKQ2RX6BGpv0x4=w600-h300-pc0xffffff-pd" width="100px">|
 <br>
 
 ## 구현 기능
